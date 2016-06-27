@@ -1,0 +1,33 @@
+{
+  "name": "2DBeam_Tracer",
+  "version": "1.0.0",
+  "description": "A 2 0 Dimensional Physically based Frustrum Tracer that traces rays, instead of frustrums",
+  "main": "index.html",
+  "scripts": {
+    "test": "hello"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bryce-Summers/2DBeam_Tracer.git"
+  },
+  "keywords": [
+    "ray",
+    "tracing",
+    "2D",
+    "frustrums",
+    "light",
+    "svg"
+  ],
+  "author": "Bryce Summers",
+  "license": "???",
+  "bugs": {
+    "url": "https://github.com/Bryce-Summers/2DBeam_Tracer/issues"
+  },
+  "homepage": "https://github.com/Bryce-Summers/2DBeam_Tracer",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-uglify": "^1.0.1",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-include-source": "^1.0.0"
+  }
+}

@@ -1,0 +1,19 @@
++ -- Installation Notes --+
+
+Download grunt to inject the all of the files automatically.
+
+// Initialize nom repository.
+npm init
+
+<!-- include: "type": "css", "files": "**/*.css" -->
+<!-- /include -->
+<!-- include: "type": "js", "files": "**/*.js" -->
+<!-- /include -->
+
+
+npm install grunt --save-dev
+npm install grunt-contrib-uglify --save-dev
+npm install grunt-contrib-watch --save-dev
+npm install grunt-include-source
+
+npm update

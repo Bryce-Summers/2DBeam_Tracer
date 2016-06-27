@@ -1,0 +1,20 @@
+if is common for me to write a function as:
+
+foo() ->
+
+which is not caught by the coffeescript interpreter.
+
+it should instead be written as:
+
+foo: () ->
+
+
+the @ sign must not be ommitted to ensure proper internal class scoping.
+
+
+always put the trailing '()' braces after a function call, because otherwise it assumes you want the function and the function is true when you are conditioning on the return value.
+
+--> Always Use foo(), not foo.
+
+
+Make sure to spell thinks like isEmissiveSource correctly.

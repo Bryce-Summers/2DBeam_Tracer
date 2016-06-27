@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>2D Beam Tracer [Bryce-Summers</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #ffffff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #ffffff;
+			}
+
+			#oldie a { color:#da0 }
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		
+		<script src="js/three.js"></script>
+		
+        <script>
+            BT2D = {};        
+        </script>
+
+        <!-- Automatically include all scripts. -->
+        <!-- http://stackoverflow.com/questions/37553112/grunt-include-source-doesnt-work-->
+        
+        <!--include everything in scripts/ except files directly inside scripts (without subdirectory) -->
+        <script src="lib/aggregates/beamTracerScene.js"></script>
+        <script src="lib/aggregates/bsp.js"></script>
+        <script src="lib/aggregates/lightFrustrumSet.js"></script>
+        <script src="lib/aggregates/surfaceSet.js"></script>
+        <script src="lib/geometry/circle.js"></script>
+        <script src="lib/geometry/frustrum.js"></script>
+        <script src="lib/geometry/geometry.js"></script>
+        <script src="lib/geometry/line.js"></script>
+        <script src="lib/geometry/ray.js"></script>
+        <script src="lib/rendering/frustrumDrawer.js"></script>
+        <script src="lib/scene/lightFrustrumSet.js"></script>
+        <script src="lib/surfaces/LightFrustrum.js"></script>
+        <script src="lib/surfaces/material.js"></script>
+        <script src="lib/surfaces/spectrum.js"></script>
+        <script src="lib/surfaces/surface.js"></script>
+        <script src="lib/test_scene/radialTestScene.js"></script>
+        <script src="lib/tracers/FrustrumTracer.js"></script>
+        <script src="lib/tracers/intersection.js"></script>
+        <!-- endbuild -->
+        
+        <script src="src/main.js"></script>
+	
+	</body>
+</html>

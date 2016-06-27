@@ -1,0 +1,20 @@
+###
+    Ray object.
+
+    Written by Bryce Summers on 6/18/2016.
+    
+    Purpose:
+     - This class represents a Ray starting at an origination point and
+       proceding infinitely out into space in a particular direction.
+###
+
+class BT2D.Ray
+
+    # inputs are THREE.Vector3 instances.
+    constructor: (_origin, _direction) ->
+
+        @_origin    = _origin.clone()
+        @_direction = _direction.clone()
+    
+    getOrigin: () -> return @_origin.clone()
+    getDirection: ()  -> return @_direction.clone()
