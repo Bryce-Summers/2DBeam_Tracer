@@ -9,6 +9,9 @@
 
 class BT2D.Intersection
     constructor: ->
+        @clear()
+        
+    clear: ->
         # float, relevant for ray intersections.
         @time = null
         # the location in space that the intersection occurs at.
@@ -16,17 +19,19 @@ class BT2D.Intersection
         
         # This stores the surface object containing both the geometry and material properties of the stored intersection point.
         @surface = null
-        
-    # For efficiency, we don't compute the actual location during intersection, unless it is convenient.
-    # This function allows a caller to compute the actual position of the intersection once they are sure they care about it.
+
+    notFound: () ->
+        return @time == null and @location == null
+
+    # For efficiency, we only store the minnimum computed data when performing intersections.
+    # this function may be used to fill in some of the gaps.
+    # FIXME: I will need to think more about this if I decided to implement more than just lines.
     computePosition: (ray) ->
     
-        if(@time == null)
+        if(@time == null or @time == BT2D.Constants.NO_INTERSECTION)
             console.log("Error in Intersection, time was null.")
+            debugger
         
-        offset = ray.getDirection().clone()
-        offset.multiplyScalar(@time)
-        @location = ray.getOrigin().clone()
-        @location.add(offset)
+        @location = ray.getPosition(@time)
         return @location
         

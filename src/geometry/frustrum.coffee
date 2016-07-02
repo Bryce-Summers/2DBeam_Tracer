@@ -45,5 +45,27 @@ class BT2D.Frustrum
     getEnd1: () -> @_end1
     getEnd2: () -> @_end2
         
+    getLeftBP: () ->
+        return new BT2D.Line(@_start1, @dir1, BT2D.Line.RAY)
 
+    getRightBP: () ->
+        return new BT2D.Line(@_start2, @dir2, BT2D.Line.RAY)
 
+    getLeftRay: () ->
+        return new BT2D.Line(@_start1, @dir1, BT2D.Line.RAY)
+
+    getRightRay: () ->
+                return new BT2D.Line(@_start1, @dir1, BT2D.Line.RAY)
+
+    # All frustrums have a focus point defined by the intersection of the two rays.
+    # Any frustrum that does not have a focus point is said to be mono-directional and will return null.
+    getFocusPoint: () ->
+        left  = @getLeftRay()
+        left.makeUnbounded()
+        right = @getRightRay().getInvert()
+        left.makeUnbounded()
+
+        # Specifically allow same origin starts.
+        return null if not (left.intersect(right, intersection))
+
+        return intersection.computePosition(right)

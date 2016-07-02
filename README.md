@@ -67,3 +67,9 @@
  Every light is really nothing more than an emmisive material,
  but a point light or circular light is a special case that has an infinite number of outgoing facets.
  
+
+
+Style guide.
+
+When implementing an interface such as one specified in the ADT folder, put an #@Override Geometry. comment ontop of the function.
+Use _name for private class variables and functions that should not be referenced outside of the class.

@@ -8,6 +8,9 @@
        proceding infinitely out into space in a particular direction.
 ###
 
+
+# FIXME: I feel like I should probably get rid of this class entirely and roll it into the line class, since that would make things easier.
+
 class BT2D.Ray
 
     # inputs are THREE.Vector3 instances.
@@ -18,3 +21,14 @@ class BT2D.Ray
     
     getOrigin: () -> return @_origin.clone()
     getDirection: ()  -> return @_direction.clone()
+
+    getPosition: (time) ->
+        offset = @getDirection()
+        offset.multiplyScalar(time)
+        location = @getOrigin()
+        location.add(offset)
+        return location
+
+
+    getType: () ->
+        return BT2D.Line.RAY

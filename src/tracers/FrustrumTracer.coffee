@@ -25,7 +25,7 @@ class BT2D.FrustrumTracer
 
         # We Complete all of the frustrums through ray tracing and also derive the associated lightFrustrums.
         # NOTE: the 'initial_frustrums' will now contain completed data.
-        i=0
+        i = 0
         while i < incomplete_frustrum_set.length
 
             lightFrustrum = incomplete_frustrum_set[i]
@@ -56,20 +56,20 @@ class BT2D.FrustrumTracer
         ray1 = new BT2D.Ray(frustrum.getStart1(), frustrum.dir1)
         ray2 = new BT2D.Ray(frustrum.getStart2(), frustrum.dir2)
         
-        end1 = null
-        end2 = null
+        end1  = null
+        end2  = null
         dist1 = null
         dist2 = null
         
         # Check for an intersection2 and if so complete the frustrum.
-        if surfaceSet.intersectRay(ray1, intersection)
+        if surfaceSet.intersectRay(ray1, intersection, BT2D.Constants.EPSILON)
             end1 = intersection.computePosition(ray1)
             dist1 = intersection.time
         else
             console.log("ERROR: We are not able to properly handle view bounded frustrums yet.")
             return []
             
-        if surfaceSet.intersectRay(ray2, intersection)
+        if surfaceSet.intersectRay(ray2, intersection, BT2D.Constants.EPSILON)
             end2 = intersection.computePosition(ray2)
             dist2 = intersection.time
         else

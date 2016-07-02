@@ -11,20 +11,22 @@
         - efficient frustrum - linearSurfaceSet intersections.
 ###
 
-class BT2D.SurfaceSet
+class BT2D.SurfaceSet # implements BT2D.Geometry, BT2D.Set
     constructor: ->
     
         # A set of Surfaces
         @_set = []
         @_emissive_set = []
     
+    # TODO: Change this to 'add'
     addSurface: (surface) ->
         
         @_set.push(surface)
 
         # Keep track of those surfaces that are emissive sources.
         @_emissive_set.push(surface) if surface.isEmissiveSource()
-        
+    
+    # TODO: Change this to 'clear'
     clearSurfaces: ->
         @_set = []
         @_emissive_set = []
@@ -39,10 +41,16 @@ class BT2D.SurfaceSet
         return output
 
     # Returns truee iff a forward intersection was found.
-    intersectRay: (ray, intersection) ->
+    intersectRay: (ray, intersection, min_time) ->
 
         out = false;
         for surface in @_set
-            out |= surface.intersectRay(ray, intersection)
+            out |= surface.intersectRay(ray, intersection, min_time)
             
         return out
+
+    #(BT2D Frustrum, BT2D.Intersection[])
+    # Returns true if this has added an intersection to the list, adds all intersections in a well - oriented order to the given list.
+    intersectFrustrum: (frustrum, intersection_list) ->
+        console.log("Implement Me!")
+        debugger

@@ -72,8 +72,8 @@ class BT2D.Surface
 
     # Intersect min fills out the intersection information iff there is an intersection in the forward ray direction that is less than any intersection thus far.
     # returns iff there was an intersection found for this call (regardless of whether an intersection has been found previously.)
-    intersectRay: (ray, intersection) ->
-        if @geometry.intersectRay(ray, intersection)
+    intersectRay: (ray, intersection, min_time) ->
+        if @geometry.intersectRay(ray, intersection, min_time)
             intersection.surface = @
             return true
         else
