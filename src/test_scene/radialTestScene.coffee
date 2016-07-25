@@ -49,7 +49,7 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
             # Create the inner flood lights.
             #@createPolarSurface(@emmissiveSourceMaterial, 5, i + inc/10 + .05, i + inc + inc/10 - .05)
             # Create the outer fully absorbtive walls.
-            @createPolarSurface(@absorptiveSourceMaterial, 50, i + inc*3/2, i + inc/2)
+            @createPolarSurface(@absorptiveSourceMaterial, 50, i + inc*3/2 , i + inc/2)
 
     createBasicTestScene: (n) ->
         ###
@@ -63,12 +63,12 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
         # A wall in the middle of the screen.
         @createSurface(@absorptiveSourceMaterial,
             new THREE.Vector3( -10, 0, 0)
-            new THREE.Vector3(  10, 0, 0))
+            new THREE.Vector3(  10, 3, 0))
 
         # A wall in the middle of the screen.
         @createSurface(@absorptiveSourceMaterial,
-            new THREE.Vector3(  15, 10, 0)
-            new THREE.Vector3(  15, 20, 0))
+            new THREE.Vector3(  -10, 0, 0)
+            new THREE.Vector3(   -5, 5, 0))
 
 
     # Here are two helper functions for our test scene.

@@ -77,7 +77,7 @@ class BT2D.FrustrumTracer
         lightf1 = new BT2D.LightFrustrum(f1, full, full, null)# NULL --> it doesn't start anywhere.
         
 
-        return [lightf0]
+        return [lightf0, lightf1]
 
 
     # BT2D.LightFrustrum (incomplete), BT2D.LinearSurfaceSet
@@ -106,7 +106,7 @@ class BT2D.FrustrumTracer
         output.push(left) if left != null
         output.push(right) if right != null
         
-        #zzzsurface.emitScatteringFrustrums(lightFrustrum, output)
+        #surface.emitScatteringFrustrums(lightFrustrum, output)
 
         return output
 

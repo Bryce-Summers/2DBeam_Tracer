@@ -132,11 +132,15 @@ class BT2D.Line #implements BT2D.Geometry, BT2D.BinaryPartitioner
 
         # We can simplify the logic tests by sorting the points
         # with regards to the orientation of this frustrum.
+        
+        ###
         [pt_left, pt_right] = bp_left.orientPts(@_p1, @_p2)
         [pt_left2, pt_right2] = bp_right.orientPts(@_p1, @_p2)
+        ###
 
-        #[pt_left, pt_right] = @_radiallyOrientPts(lightFrustrum, @_p1, @_p2)
-        
+        [pt_left, pt_right] = @_radiallyOrientPts(lightFrustrum, @_p1, @_p2)
+        pt_left2 = pt_left
+        pt_right2 = pt_right
 
 
         # Break this down into cases.
@@ -478,7 +482,7 @@ class BT2D.Line #implements BT2D.Geometry, BT2D.BinaryPartitioner
         orientation_ray = lightFrustrum.getSplitRay(pt1)
         classification = orientation_ray.side_test(pt2)
 
-        return [pt1, pt2] if classification <= BT2D.Constants.ON
+        return [pt1, pt2] if classification >= BT2D.Constants.ON
         return [pt2, pt1]
 
 # Types of lines.
