@@ -38,13 +38,21 @@ class BT2D.BeamTracerScene
     #surface BT2D.Surface
     addSurface: (surface) ->
             
-        @_surfaceSet.addSurface(surface)
+        @_surfaceSet.add(surface)
         @surfacesChanged = true
+
+    createSurface: (material, p1, p2) ->
+        geometry = new BT2D.Line(p1, p2, )
+        surface = new BT2D.Surface(geometry, material)
+        @addSurface(surface)
         
     clearSurfaces: () ->
-        @_surfaceSet.clearSurfaces()
+        @_surfaceSet.clear()
         @surfacesChanged = true
-        
+
+    generateBSP: () ->
+        @_surfaceSet.generateBSP()
+
     # This needs to be called externally to indicate that the user is ready to trace the frustrums.
     traceFrustrums: ->
     

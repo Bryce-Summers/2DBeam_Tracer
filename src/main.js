@@ -4,7 +4,7 @@ var n = 4;
 // Define the global BT2D namespace.
 
 function init() {
-    
+
     //Create a new scene.
     //FIXME: Import an SVG or some other sort of non hard coded scene.
     scene = new BT2D.RadialTestScene(n);
@@ -21,7 +21,10 @@ function init() {
     window.addEventListener( 'resize', onWindowResize, false);
     //window.addEventListener("keypress", onKeyPress);
     window.addEventListener("keydown", onKeyPress);
+
+    window.addEventListener("mousemove", onMouseMove);
 }
+
 
 // Input Events.
 function onWindowResize( event )
@@ -31,12 +34,10 @@ function onWindowResize( event )
 
 function onKeyPress( event )
 {
-    var LEFT = 37
+    var LEFT  = 37
     var RIGHT = 39
     
     var old_n = n;
-    
-    console.log(event)
     
     switch(event.which)
     {
@@ -44,7 +45,7 @@ function onKeyPress( event )
             console.log("LEFT")
             break;
         case  RIGHT: n = Math.min(n + 1, 20)
-            console.log("RIGHT");
+            console.log("RIGHT")
             break;
         default:
             break;
@@ -53,10 +54,20 @@ function onKeyPress( event )
     
     if(n !== old_n)
     {
-        console.log("Creating new Scene");
         scene.createScene(n);
     }
 }
+
+function onMouseMove( event )
+{
+    console.log(event);
+
+    BT2D.mouse_x = (event.x*1.0/window.innerWidth  - .5) * 100;
+    BT2D.mouse_y = (event.y*1.0/window.innerHeight - .5) * -100;    
+
+    scene.createScene(n);
+}
+
 
 function animate() {
 

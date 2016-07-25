@@ -26,7 +26,9 @@
 4. In the other you can automatically inject all of the source code links into the html file:
  npm install
  grunt
- 
+
+// FIXME: I need to properly handle ray intersections at points where line geometry intersects. the ray should be allowed to stay at the same point, while intersecting a secondary geometry.
+// I believe I have handled this for frustrums... We may also need to eventually handle more than two pieces of geometry intersecting at the same location, but hopefully not... 
  
 + -- Contributions you could make -- +
  - Tell people about this project.
@@ -61,6 +63,8 @@
  
  If some feature is not working, you likely need to enable it or set a flag to let three.js know that you have changed something.
  
+ 
+ I should go through and minnimize the scaling of line side test factors and normalize offsets where appropiate to prevent numeric explosions.
  
  + -- Structural thoughts -- +
  Surface is a line segment with an attached material defined by a bdrf.

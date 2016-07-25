@@ -19,8 +19,10 @@ class BT2D.LightFrustrumSet
         @_set.push(lightFrustrum)
         
     convertToTriangles: (frustrumDrawer) ->
-    
-        frustrum.convertToTriangles(frustrumDrawer) for frustrum in @_set
+          
+        for frustrum in @_set
+            frustrum.convertToTriangles(frustrumDrawer) 
+            
         
     # Clears all of the light frustrums from this set.
     clearAll: ->

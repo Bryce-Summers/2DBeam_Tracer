@@ -16,9 +16,28 @@ class BT2D.BinaryPartitioner
     # Use an analogue to a line side test to 
     # Classify the incoming THREE.Vector3 point and return one of the following:
     # BT2D.LEFT, BT2D.ON, BT2D.RIGHT
+    # BT2D.On will be returned for any point within the area of the binary classifer,
+    # so once I implement area classifiers they will have a non-trivial region that returns the on result.
     side_test: (pt) ->
         console.log("Interface only.")
         debugger;
+
+    # Returns a scalar value such that f(pt1) < f(pt2) --> pt1 is left of pt2 in terms
+    # of the orientation of this binary classifier.
+    side_test_scalar: (pt) ->
+        console.log("Interface only.")
+        debugger;
+
+    # Efectively sorts the pts via their line side polarity.
+    # FIXME: If we wanted to we could add a signed line side test to the spec, but it is not yet needed.
+    orientPts: (pt1, pt2) ->
+        
+        # Reference implementation.
+        side1 = @side_test_scalar(pt1)
+        side2 = @side_test_scalar(pt2)
+
+        return [pt1, pt2] if side1 < side2
+        return [pt2, pt1]
 
     # Returns a representative point 'pt' such that @side_test(pt) = BT2D.ON
     representative_point: () ->
@@ -33,4 +52,4 @@ class BT2D.BinaryPartitioner
     # returns a positive time if a valid intersection exists, otherwise returns BT2D.Constants.NO_INTERSECTION_TIME, which is guranteed to be negative.
     ray_partition_intersection_time: (ray) ->
         console.log("Interface only.")
-        debugger;        
+        debugger;

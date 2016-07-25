@@ -31,6 +31,7 @@ class BT2D.FrustrumDrawer
             transparent: true
             blending: THREE.AdditiveBlending # Additive blending sums up the contributions for intersecting light frustrums.
             depthTest: false # We negate the depth test to hopefully avoid the need for the non-communitive workarounds.
+            
         })
 
         @_mesh = new THREE.Mesh( @_geometry, @_material );
@@ -53,11 +54,13 @@ class BT2D.FrustrumDrawer
         face.vertexColors = [c1, c2, c3]
 
         @_geometry.faces.push(face)
+        @_geometry.elementsNeedUpdate = true
 
     
     clearTriangles: ->
 
         # FIXME: It would be much more efficient to maintain a large enough array and then dynamically update the contents and how much of it is used.
+        # https://github.com/mrdoob/three.js/issues/342
         @resetGeometryBuffer()
     
         @_geometry.faces = [];

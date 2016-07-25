@@ -31,6 +31,7 @@ class BT2D.Intersection
         if(@time == null or @time == BT2D.Constants.NO_INTERSECTION)
             console.log("Error in Intersection, time was null.")
             debugger
+            throw new Error("Error in Intersection, time was null")
         
         @location = ray.getPosition(@time)
         return @location

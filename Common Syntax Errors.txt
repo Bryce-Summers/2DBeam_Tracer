@@ -18,3 +18,8 @@ always put the trailing '()' braces after a function call, because otherwise it 
 
 
 Make sure to spell thinks like isEmissiveSource correctly.
+
+if a random undefined comes from a return array value, make sure ever part of that function returns a list of nulls of the appropiate length.
+
+
+Ah!!! Since by BSP assumes that the first node to give a valid intersection is the closest one, the erroneous ray split was returned.

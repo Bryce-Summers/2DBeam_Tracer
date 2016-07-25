@@ -18,9 +18,10 @@ class BT2D.Spectrum
 
     constructor: (@red, @green, @blue) ->
     
-         throw new Error("bad red value") if @red < 0 or @red > 1
-         throw new Error("bad green value") if @green < 0 or @green > 1
-         throw new Error("bad blue value") if @blue < 0 or @blue > 1
+        throw new Error("bad red value") if @red < 0 or @red > 1
+        throw new Error("bad green value") if @green < 0 or @green > 1
+        throw new Error("bad blue value") if @blue < 0 or @blue > 1
+
     
     # Returns iff this spectrum is of such a small intensity that
     # it no longer makes a perceivable contribution.
@@ -45,7 +46,7 @@ class BT2D.Spectrum
         
     decay: (dist1) ->
         # FIXME: I need to extract his value to some global property configuration.
-        max_length = 70
+        max_length = BT2D.Constants.LIGHT_LENGTH
         return @multScalar(Math.max(0, Math.min(1.0, 1.0 - dist1/max_length)))
         
     

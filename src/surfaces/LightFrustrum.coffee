@@ -12,16 +12,25 @@
             start1(), start2(), getEnd2(), frustrum.getEnd1()
 
     The LightFrustrum is said to be complete then it has all 4 points, but imcomplete it it only has the near points defined.
+
+    The source geometry is the geometry that radiated this light frustrum.
+    It will be required to ensure that we do not allow a light frustrum to intersect its source, while also allowing light frustrums to intersect geometries
+    that intersect the source at the starting points.
 ###
 
 class BT2D.LightFrustrum
-    constructor: (@frustrum, @spectrum1, @spectrum2) ->
+    constructor: (@frustrum, @spectrum1, @spectrum2, @source_geometry) ->
         @spectrum3 = null
         @spectrum4 = null
         
     
     # Complete the Light Frustrum with the far side.
     complete: (end1, end2, dist1, dist2) ->
+
+        if end1.clone().sub(end2).length() < .001
+            console.log("ERROR: Bad completion. 2D Beam tracer frustrums are guranteed to never intersect the same end points.");
+            debugger;
+
         @frustrum.complete(end1, end2)
         
         # We compute the spectrums of the ending colors merely as a function of the distance that they have travelled.
@@ -59,3 +68,67 @@ class BT2D.LightFrustrum
         #FIXME: Does the decomposition of the quarilateral into two triangles matter? Could it be done the other way?
         frustrumDrawer.addTriangle(v1, v2, v3, c1, c2, c3)
         frustrumDrawer.addTriangle(v3, v4, v1, c3, c4, c1)
+
+
+    # Returns the left split light frustrum and mutates this light frustrum to be the right split.
+    # Properly interpolates the light spectrum values.
+    # The input pt represents the left pt of a piece of geometery that does not occlude the left side of this frustrum.
+    # Returns null if the split off frustum had trivial area.
+    splitLeft : (pt) ->
+
+        [split_ray, percentage] = @frustrum.getSplitRay(pt)
+
+        # In this case, this frustum only touches the line, but doesn't contain a non trivial intersection area.
+        if percentage > 1.0 - BT2D.Constants.EPSILON or percentage < 0.0 + BT2D.Constants.EPSILON
+            console.log("WARNING: A trivial splitLeft was attempted.")
+            debugger;
+            return null
+
+        left_frustrum = new BT2D.Frustrum(@frustrum.getStart1(), split_ray.getOrigin(),
+                                            @frustrum.getDir1(), split_ray.getDirection())
+
+        split_spectrum = @spectrum1.multScalar(percentage).add(@spectrum2.multScalar(1.0 - percentage))
+
+        output = new BT2D.LightFrustrum(left_frustrum, @spectrum1, split_spectrum)
+
+        # Now mutate this light spectrum to be the right of the split.
+        @spectrum1 = split_spectrum
+        @frustrum.setLeftRay(split_ray)
+
+        return output
+
+    # Returns null if the split off frustum had trivial area.
+    splitRight : (pt) ->
+
+
+        ###
+        This is where the problem happens.
+        ###
+
+        [split_ray, percentage] = @frustrum.getSplitRay(pt)
+
+        # In this case, this frustum only touches the line, but doesn't contain a non trivial intersection area.
+        if percentage > 1.0 - BT2D.Constants.EPSILON or percentage < 0.0 + BT2D.Constants.EPSILON
+            console.log("WARNING: A trivial splitRight was attempted.")
+            debugger;
+            return null
+        
+        # Construct a frustrum that is the subset of this light frustrum that contains no rays to the left of the line's left point.
+        right_frustrum = new BT2D.Frustrum(split_ray.getOrigin(),    @frustrum.getStart2()
+                                           split_ray.getDirection(), @frustrum.getDir2())
+
+        split_spectrum = @spectrum1.multScalar(percentage).add(@spectrum2.multScalar(1.0 - percentage))            
+
+        output = new BT2D.LightFrustrum(right_frustrum, split_spectrum, @spectrum2)
+
+        # Now mutate this light spectrum to be the left of the split.
+        @spectrum2 = split_spectrum
+        @frustrum.setRightRay(split_ray)
+
+        return output
+
+    # This will be used to radially orient points, when we need to get a ray from the frustrum to a given point.
+    # This doesn't do any bounds checking.
+    getSplitRay: (pt) ->
+        [split_ray, percentage] = @frustrum.getSplitRay(pt)
+        return split_ray
