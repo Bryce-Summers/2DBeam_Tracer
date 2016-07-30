@@ -42,10 +42,10 @@ class BT2D.LightFrustrum
         @spectrum3 = @spectrum2.decay(dist2)
         
     getEndSpectrum1: () ->
-        return @spectrum4
+        return @spectrum4.clone()
 
     getEndSpectrum2: () ->
-        return @spectrum3
+        return @spectrum3.clone()
 
     # BT2D.FrustrumDrawer
     convertToTriangles: (frustrumDrawer) ->

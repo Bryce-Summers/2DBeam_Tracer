@@ -499,6 +499,13 @@ class BT2D.Line #implements BT2D.Geometry, BT2D.BinaryPartitioner
         return [pt1, pt2] if classification >= BT2D.Constants.ON
         return [pt2, pt1]
 
+    getPerpendicularPercentage: (dir) ->
+        my_dir = @getDirection().normalize()
+        percentage_par = dir.normalize().dot(my_dir)
+        ray_length = 1.0#ray_dir.length()
+        percentage_perp = Math.sqrt(ray_length*ray_length - percentage_par*percentage_par)
+        return percentage_perp
+
 # Types of lines.
 BT2D.Line.SEGMENT = 0   # Both end points define ends for the line.
 BT2D.Line.UNBOUNDED = 1 # Specifies any linear combination of the two input points.

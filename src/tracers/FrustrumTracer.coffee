@@ -31,6 +31,10 @@ class BT2D.FrustrumTracer
         i = 0
         while i < incomplete_frustrum_set.length
 
+
+            if i > 100
+                break;
+
             lightFrustrum = incomplete_frustrum_set[i]
             i++
 
@@ -106,7 +110,7 @@ class BT2D.FrustrumTracer
         output.push(left) if left != null
         output.push(right) if right != null
         
-        #surface.emitScatteringFrustrums(lightFrustrum, output)
+        surface.emitScatteringFrustrums(lightFrustrum, output)
 
         return output
 

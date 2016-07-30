@@ -17,9 +17,11 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
         fullIntensitySpectrum = new BT2D.Spectrum(1.0, 1.0, 1.0)
         noIntensitySpectrum   = new BT2D.Spectrum(0.0, 0.0, 0.0)
 
-        @emmissiveSourceMaterial  = new BT2D.Material(fullIntensitySpectrum)
-        @absorptiveSourceMaterial = new BT2D.Material(noIntensitySpectrum)
-        
+        @emmissiveSourceMaterial  = new BT2D.Material(fullIntensitySpectrum, noIntensitySpectrum)
+        @absorptiveSourceMaterial = new BT2D.Material(noIntensitySpectrum, noIntensitySpectrum)
+        @specularSourceMaterial = new BT2D.Material(noIntensitySpectrum, fullIntensitySpectrum)       
+
+
         @createScene(n)
 
     createScene: (n) ->
@@ -53,10 +55,10 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
             @createPolarSurface(@absorptiveSourceMaterial, 50, i + inc*3/2 , i + inc/2)
 
     createRandomScene: (n) ->
-        for i in [0 ... n*30]
+        for i in [0 ... n]#*30]
             v1 = @randomVector(50)
             v2 = v1.clone().add(new THREE.Vector3(0, 3, 0))
-            @createSurface(@absorptiveSourceMaterial,
+            @createSurface(@specularSourceMaterial,
                 v1,
                 v2)
 

@@ -16,13 +16,15 @@
 class BT2D.Material
  
     # This needs a lot of work.
-    constructor: (@emissive) ->
+    constructor: (@emissive, @specular) ->
         # FIXME.
         #@emmisive = new BT2D.spectrum()
         
     isEmissiveSource: ->
         return !@emissive.imperceptible()
-        
+
+    getSpecularSpectrum: ->
+        return @specular.clone()        
     
     getEmmissiveSourceSpectrum: ->
         return @emissive.clone()

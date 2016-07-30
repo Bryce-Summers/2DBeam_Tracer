@@ -53,3 +53,8 @@ class BT2D.BinaryPartitioner
     ray_partition_intersection_time: (ray) ->
         console.log("Interface only.")
         debugger;
+
+    # Returns the percentage of each unit length step of the ray that constitutes movement perpendicular to this binary partitioner.
+    getPerpendicularPercentage: (ray) ->
+        console.log("Interface only.")
+        debugger;        

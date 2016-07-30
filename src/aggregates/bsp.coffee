@@ -217,6 +217,7 @@ class BT2D.BSP # implements BT2D.Geometry
             console.log("Does SLANT LEFT really happen?")
             console.log("Yes is does!")
             ###
+            #time1 = 
 
         # SLANT RIGHT
         if time2 == BT2D.Constants.NO_INTERSECTION
@@ -232,7 +233,9 @@ class BT2D.BSP # implements BT2D.Geometry
 
         # Finally search the other side if necessary.
         if (not found) and otherSide != null
+            perp_1 = @_bp.getPerpendicularPercentage(ray_left.getDirection())
+            perp_2 = @_bp.getPerpendicularPercentage(ray_right.getDirection())
             # Note: We subtract out the Epsilons to enable detection of itersections with geoemtry that perfectly end on the binary partition for this node.
-            [found, left_frustrum, right_frustrum, surface] = otherSide.intersectFrustrum(lightFrustrum, time1 - BT2D.Constants.EPSILON, time2 - BT2D.Constants.EPSILON)
+            [found, left_frustrum, right_frustrum, surface] = otherSide.intersectFrustrum(lightFrustrum, time1 - 2*BT2D.Constants.EPSILON/perp_1, time2 - 2*BT2D.Constants.EPSILON/perp_2)
 
         return [found, left_frustrum, right_frustrum, surface]

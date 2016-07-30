@@ -44,13 +44,26 @@ class BT2D.Surface
 
         input_frustrum = incomingLightFrustrum.frustrum
 
-        # For now, compute perfect specular reflection.
+        
         if @_geometry instanceof BT2D.Line
+
+
+            specular_reflectance_spectrum = @_material.getSpecularSpectrum()
+            
+            # If the material does not have enough reflectance.
+            if specular_reflectance_spectrum.imperceptible()
+                return false
+
+            # -- Computation for a perfect specular reflection.
 
             # Since we are prefectly reflecting, the orientation has changed and we therefore reverse the 1 and 2 rays
             # when reading from the inputs.
             spectrum_1 = incomingLightFrustrum.getEndSpectrum2()
             spectrum_2 = incomingLightFrustrum.getEndSpectrum1()
+
+            # Apply the ratio of the amount of energy that is reflected.
+            spectrum_1 = spectrum_1.mult(specular_reflectance_spectrum)
+            spectrum_2 = spectrum_2.mult(specular_reflectance_spectrum)
 
             # Dont't emit any scattering frustrums that don't have enough energy left.
             if spectrum_1.imperceptible() && spectrum_2.imperceptible()
@@ -60,18 +73,24 @@ class BT2D.Surface
             incoming_dir1 = input_frustrum.getDir2()
             incoming_dir2 = input_frustrum.getDir1()
 
-            debugger;
-            end1 = input_frustrum.getEnd2().sub(incoming_dir1.clone().multiplyScalar(BT2D.Constants.EPSILON*2))
-            end2 = input_frustrum.getEnd1().sub(incoming_dir2.clone().multiplyScalar(BT2D.Constants.EPSILON*2))
-
-            if end1.clone().sub(end2).length() < BT2D.Constants.MINNIMUM_SCATTER_SEPARATION
-                console.log("Discarding small frustrum.");
-                return
-
             line = @_geometry
 
             outgoing_dir1 = line.getPerfectSpecularReflectionDirection(incoming_dir1)
             outgoing_dir2 = line.getPerfectSpecularReflectionDirection(incoming_dir2)
+
+            perp_1 = line.getPerpendicularPercentage(incoming_dir1)
+            perp_2 = line.getPerpendicularPercentage(incoming_dir2)
+
+            # Swap due to reflection.
+            end1 = input_frustrum.getEnd2()
+            end2 = input_frustrum.getEnd1()
+
+            end1.sub(incoming_dir1.multiplyScalar(BT2D.Constants.EPSILON*2/perp_1))
+            end2.sub(incoming_dir2.multiplyScalar(BT2D.Constants.EPSILON*2/perp_2))
+
+            if end1.clone().sub(end2).length() < BT2D.Constants.MINNIMUM_SCATTER_SEPARATION
+                console.log("Discarding small frustrum.")
+                return
 
             scattered_frustrum = new BT2D.Frustrum(end1, end2, outgoing_dir1, outgoing_dir2)
 

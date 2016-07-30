@@ -213,8 +213,8 @@ class BT2D.Frustrum
 
             # We can then compute the percentage along the start edge via a comparison of distances.
             # FIXME: reword this, since I am tired right now.
-            dist1 = split_start.clone().sub(@_start1)
-            dist2 = split_start.clone().sub(@_start2)
+            dist1 = split_start.clone().sub(@_start1).length()
+            dist2 = split_start.clone().sub(@_start2).length()
             percentage = dist1 / (dist1 + dist2)
 
             split_ray = new BT2D.Line(split_start, pt)
