@@ -315,8 +315,6 @@ class BT2D.Line #implements BT2D.Geometry, BT2D.BinaryPartitioner
         # This only works, if we have computed the correct left and right points.
         lightFrustrum.complete(pt_left, pt_right, dist1, dist2)
 
-        console.log(lightFrustrum);
-
         return [true, left_frustrum, right_frustrum, null]
 
 
@@ -444,13 +442,29 @@ class BT2D.Line #implements BT2D.Geometry, BT2D.BinaryPartitioner
 
 
         # No intersection between unbounded implies this line is parrallel to the space partitioner.
+        # We simply send the line on to the relevant partition.
         if time == BT2D.Constants.NO_INTERSECTION or (side1 == side2 and @_type == BT2D.Line.SEGMENT)
             return [@, null, null] if side1 < 0
             return [null, @, null] if side1 == 0
             return [null, null, @] if side1 > 0
 
         pt_split = @getPosition(time)
-        
+
+        # Clamp left. Non unbounded lines need to be split a non trivial distance along the positive portion of the line.
+        if @_type != BT2D.Line.UNBOUNDED and time < BT2D.Constants.EPSILON
+            return [@, null, null] if side2 < 0
+            return [null, @, null] if side2 == 0
+            return [null, null, @] if side2 > 0
+
+        # Clamp right. Line segments need to be split containing a non trivial portion of the region from time 1.0 in the negatie direction.
+        if @_type == BT2D.Line.SEGMENT and time > 1.0 - BT2D.Constants.EPSILON
+            return [@, null, null] if side1 < 0
+            return [null, @, null] if side1 == 0
+            return [null, null, @] if side1 > 0
+
+        out1 = null
+        out2 = null
+
         switch @_type
             when BT2D.Line.UNBOUNDED
                 out1 = new BT2D.Line(pt_split, @_dir.clone().multiplyScalar(-1), BT2D.Line.RAY)

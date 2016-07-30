@@ -88,7 +88,7 @@ class BT2D.FrustrumTracer
     _traceFrustrum: (lightFrustrum, surfaceSet) ->
 
 
-        [found, left, right, surface] = surfaceSet.intersectFrustrum(lightFrustrum, -BT2D.Constants.EPSILON, -BT2D.Constants.EPSILON)
+        [found, left, right, surface] = surfaceSet.intersectFrustrum(lightFrustrum, 0, 0)
 
         if !found
             console.log("ERROR: Frustrum was not properly completed.");

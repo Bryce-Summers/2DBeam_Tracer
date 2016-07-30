@@ -56,8 +56,8 @@ class BT2D.BeamTracerScene
     # This needs to be called externally to indicate that the user is ready to trace the frustrums.
     traceFrustrums: ->
     
-        # There is no need to trace the frustrums if the surfaces have not changed.
-        return if !@surfacesChanged
+        # There is no need to trace the frustrums if the surfaces have not changed and any user input light sources have not changed.
+        return if !@surfacesChanged and not BT2D.mouse_changed
         
         # Converts the surface set into a set of LightFrustrums.
         @_frustrumTracer.traceFrustrums(@_surfaceSet, @_lightFrustrumSet)

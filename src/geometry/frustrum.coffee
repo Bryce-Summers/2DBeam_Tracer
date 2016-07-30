@@ -36,8 +36,8 @@ class BT2D.Frustrum
 
 
         # We 'fudge' the starting positions of the frustrums to avoid intersections with this surface.
-        @_start1 = _start1.clone()#.add(@getDir1().multiplyScalar(BT2D.Constants.EPSILON))
-        @_start2 = _start2.clone()#.add(@getDir2().multiplyScalar(BT2D.Constants.EPSILON))
+        @_start1 = _start1.clone()
+        @_start2 = _start2.clone()
     
         # At the start, we do not yet have proper ending points,
         # we only have directions.
