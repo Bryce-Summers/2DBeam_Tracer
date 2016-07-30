@@ -23,3 +23,5 @@ if a random undefined comes from a return array value, make sure ever part of th
 
 
 Ah!!! Since by BSP assumes that the first node to give a valid intersection is the closest one, the erroneous ray split was returned.
+
+Never instantiate a vector with a non-0 z component!!! that breaks most of my 2D beam tracing assumptions!

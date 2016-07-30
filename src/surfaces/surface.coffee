@@ -60,8 +60,9 @@ class BT2D.Surface
             incoming_dir1 = input_frustrum.getDir2()
             incoming_dir2 = input_frustrum.getDir1()
 
-            end1 = input_frustrum.getEnd2()
-            end2 = input_frustrum.getEnd1()
+            debugger;
+            end1 = input_frustrum.getEnd2().sub(incoming_dir1.clone().multiplyScalar(BT2D.Constants.EPSILON*2))
+            end2 = input_frustrum.getEnd1().sub(incoming_dir2.clone().multiplyScalar(BT2D.Constants.EPSILON*2))
 
             if end1.clone().sub(end2).length() < BT2D.Constants.MINNIMUM_SCATTER_SEPARATION
                 console.log("Discarding small frustrum.");

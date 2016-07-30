@@ -2,6 +2,8 @@
 +   2D Beam Tracer Project  +
 +---------------------------+
 
+View the current version running online at the following URL: https://bryce-summers.github.io/2DBeam_Tracer/
+
 + -- History -- +
 
 - 6/18/2016: Initiated by Bryce Summers.

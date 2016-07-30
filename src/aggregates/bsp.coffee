@@ -148,8 +148,8 @@ class BT2D.BSP # implements BT2D.Geometry
         bp_right = frustrum.getRightBP()
 
         # Two points along the frustrum rays that should be guranteed to be within the space region that is represented by this bsp node.
-        pt_left  = bp_left.getPosition(min_time1 + BT2D.Constants.EPSILON*2)
-        pt_right = bp_right.getPosition(min_time2 + BT2D.Constants.EPSILON*2)
+        pt_left  = bp_left.getPosition(min_time1)
+        pt_right = bp_right.getPosition(min_time2)
 
         # classify the left point based on this BSP node's BP.
         classification_left  = @_bp.side_test(pt_left)

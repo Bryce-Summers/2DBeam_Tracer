@@ -28,8 +28,10 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
 
         
         # generate the scene.
-        @createPolarTestScene(n)
+        #@createPolarTestScene(n)
         #@createBasicTestScene(n);
+
+        @createRandomScene(n)
 
         console.log("Creating scene!")
 
@@ -41,7 +43,6 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
 
         # Finally trace the frustrums.
         @traceFrustrums()
-
         
     createPolarTestScene: (n) ->
         inc = Math.PI*2/n
@@ -50,6 +51,21 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
             #@createPolarSurface(@emmissiveSourceMaterial, 5, i + inc/10 + .05, i + inc + inc/10 - .05)
             # Create the outer fully absorbtive walls.
             @createPolarSurface(@absorptiveSourceMaterial, 50, i + inc*3/2 , i + inc/2)
+
+    createRandomScene: (n) ->
+        for i in [0 ... n*30]
+            v1 = @randomVector(50)
+            v2 = v1.clone().add(new THREE.Vector3(0, 3, 0))
+            @createSurface(@absorptiveSourceMaterial,
+                v1,
+                v2)
+
+    randomVector: (max) ->
+        x = Math.random()*max*2 - max
+        y = Math.random()*max*2 - max
+        z = 0#Math.random()*max*2 - max
+        return new THREE.Vector3(x, y, z)
+
 
     createBasicTestScene: (n) ->
         ###
@@ -62,12 +78,12 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
         
         # A wall in the middle of the screen.
         @createSurface(@absorptiveSourceMaterial,
-            new THREE.Vector3( -10, 0, 0)
+            new THREE.Vector3( -10, -1, 0)
             new THREE.Vector3(  10, 3, 0))
 
         # A wall in the middle of the screen.
         @createSurface(@absorptiveSourceMaterial,
-            new THREE.Vector3(  -10, 0, 0)
+            new THREE.Vector3(  -10, -1, 0)
             new THREE.Vector3(   -5, 5, 0))
 
 
