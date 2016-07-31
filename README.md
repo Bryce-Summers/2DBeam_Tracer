@@ -32,7 +32,7 @@ View the current version running online at the following URL: https://bryce-summ
 // FIXME: I need to properly handle ray intersections at points where line geometry intersects. the ray should be allowed to stay at the same point, while intersecting a secondary geometry.
 // I believe I have handled this for frustrums... We may also need to eventually handle more than two pieces of geometry intersecting at the same location, but hopefully not... 
  
-+ -- Contributions you could make -- +
++ -- Contributions you (or Bryce of the future...) could make -- +
  - Tell people about this project.
  - Add support for svg reading and writing.
  - Add support for your favorite type of file format.
@@ -51,7 +51,18 @@ View the current version running online at the following URL: https://bryce-summ
    because right now we can't have the frustrums die off before they hit an ending wall.
    It would also be helpful to calculate different falloffs for condensed beams and those beams that spread out.
    It would also be helpful to calculate the effect of the enironmental gasses on the beams.
+   The lighting is also currently flawed, because lighting is not linear with triangle space as I originally naively thought.
+   Lighting should fall off with distance from the source. This is an interesting problem to be solved.
  - Sometime in the future we can start thinking about rendering in the presense of non-homogeneous liquids and gasses.
+
+ - Create a way of recording interesting statistics, such as how many frustrums are being drwn to the screen.
+
+ - Find an elegant way of culling degenerate bounce paths that spam a whole bunch of tiny frustrums in corners and which currently limit the number of bounces we can support.
+
+ - Go and support 2D ray tracing. The infrastructure is in place, but not really thought about and debugged.
+ 1. It would require you to communicate with three js to rasterize ray objects.
+ 2. You would need to get the geometric ray tracing back into order since the focus has been on getting frustrum tracing working.
+ 3. You would need to implement the material functionalities for rays, instead of frustrums.
  
 + -- TODO -- +
 

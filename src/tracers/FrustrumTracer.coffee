@@ -31,9 +31,12 @@ class BT2D.FrustrumTracer
         i = 0
         while i < incomplete_frustrum_set.length
 
-
-            if i > 100
+            
+            if i > 2000
+                console.log("Too many Frustrums, loop broken.")
                 break;
+
+            
 
             lightFrustrum = incomplete_frustrum_set[i]
             i++
@@ -67,10 +70,9 @@ class BT2D.FrustrumTracer
 
         fullIntensitySpectrum = new BT2D.Spectrum(1.0, 1.0, 1.0)
         noIntensitySpectrum   = new BT2D.Spectrum(0.0, 0.0, 0.0)
-        full = fullIntensitySpectrum
 
-        emmissiveSourceMaterial  = new BT2D.Material(fullIntensitySpectrum)
-        absorptiveSourceMaterial = new BT2D.Material(noIntensitySpectrum)
+        redSpectrum = new BT2D.Spectrum(1.0, 0.0, 0.0)
+        full = redSpectrum
 
         #f0 = new BT2D.Frustrum(center, center, NW, NE)
         f0 = new BT2D.Frustrum(center, center, left, right)
@@ -109,7 +111,8 @@ class BT2D.FrustrumTracer
         # FIXME (See above)
         output.push(left) if left != null
         output.push(right) if right != null
-        
+
+                
         surface.emitScatteringFrustrums(lightFrustrum, output)
 
         return output

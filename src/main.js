@@ -60,7 +60,6 @@ function onKeyPress( event )
 
 function onMouseMove( event )
 {
-    console.log(event);
 
     BT2D.mouse_x = (event.x*1.0/window.innerWidth  - .5) * 100;
     BT2D.mouse_y = (event.y*1.0/window.innerHeight - .5) * -100;

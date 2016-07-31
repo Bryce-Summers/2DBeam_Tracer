@@ -19,7 +19,7 @@ class BT2D.Surface
     # FIXME: I need to think about how to properly encode a circular emmitted frustrum.
     # Returns a BT2D.LightFrustrum Object.
     emitSourceFrustrums: () ->
-        
+
         if @_geometry instanceof BT2D.Line
             line = @_geometry
             p1  = line.getP1()
@@ -29,7 +29,7 @@ class BT2D.Surface
             dir = line.getNormal()
             frustrum         = new BT2D.Frustrum(p1, p2, dir, dir)
             initial_spectrum = @_material.getEmmissiveSourceSpectrum()
-            lightFrustrum    = new BT2D.LightFrustrum(frustrum, initial_spectrum, initial_spectrum, @_geometry)
+            lightFrustrum    = new BT2D.LightFrustrum(frustrum, initial_spectrum, initial_spectrum, @_geometry, 0)
             return [lightFrustrum]
 
         console.log("ERROR: NON-line emmissive surfaces are not supported yet.")
@@ -43,35 +43,44 @@ class BT2D.Surface
     emitScatteringFrustrums: (incomingLightFrustrum, output) ->
 
         input_frustrum = incomingLightFrustrum.frustrum
-
         
         if @_geometry instanceof BT2D.Line
 
+            bounces_incoming = incomingLightFrustrum.getNumBounces()
 
-            specular_reflectance_spectrum = @_material.getSpecularSpectrum()
-            
-            # If the material does not have enough reflectance.
-            if specular_reflectance_spectrum.imperceptible()
+            # We need to limit the number of bounces for safety.
+
+            console.log(bounces_incoming) if bounces_incoming != 0
+
+            if bounces_incoming >= BT2D.Constants.MAX_BOUNCES
+                console.log("culling " + bounces_incoming + " bounce path")
                 return false
 
-            # -- Computation for a perfect specular reflection.
-
-            # Since we are prefectly reflecting, the orientation has changed and we therefore reverse the 1 and 2 rays
+            # Since we are prefectly reflecting, the orientation will have changed and we therefore reverse the 1 and 2 rays
             # when reading from the inputs.
             spectrum_1 = incomingLightFrustrum.getEndSpectrum2()
             spectrum_2 = incomingLightFrustrum.getEndSpectrum1()
 
-            # Apply the ratio of the amount of energy that is reflected.
-            spectrum_1 = spectrum_1.mult(specular_reflectance_spectrum)
-            spectrum_2 = spectrum_2.mult(specular_reflectance_spectrum)
 
-            # Dont't emit any scattering frustrums that don't have enough energy left.
+            # We can prune imperceptible frustrums pre transformation, due to conservation of energy.
+            # We assume that any emmisivity was irradiated in the @emitSourceFrustrums function.
             if spectrum_1.imperceptible() && spectrum_2.imperceptible()
                 return false
 
             # Yet again we swap the order.
             incoming_dir1 = input_frustrum.getDir2()
             incoming_dir2 = input_frustrum.getDir1()
+
+
+
+            # FIXME: We will need to put more though into generalizing this interface for reflections, transmissions, etc.
+            # Here is where the light transport happens. # FIXME: I should move the logic for decaying lights out of the light frustrm completion stage.
+            [spectrum_1, spectrum_2] = @_material.transformSpectrums(spectrum_1, spectrum_2, incoming_dir1, incoming_dir2)
+
+            # Dont't emit any scattering frustrums that don't have enough energy.
+            # Note: we prune after transformation, because some 
+            if spectrum_1.imperceptible() && spectrum_2.imperceptible()
+                return false
 
             line = @_geometry
 
@@ -88,13 +97,20 @@ class BT2D.Surface
             end1.sub(incoming_dir1.multiplyScalar(BT2D.Constants.EPSILON*2/perp_1))
             end2.sub(incoming_dir2.multiplyScalar(BT2D.Constants.EPSILON*2/perp_2))
 
-            if end1.clone().sub(end2).length() < BT2D.Constants.MINNIMUM_SCATTER_SEPARATION
+            if end1.clone().sub(end2).length() < BT2D.Constants.MINNIMUM_SCATTER_SEPARATION and 
+               outgoing_dir1.clone().dot(outgoing_dir2) > .999
                 console.log("Discarding small frustrum.")
                 return
 
+            # Instantate the frustrum geometry.
             scattered_frustrum = new BT2D.Frustrum(end1, end2, outgoing_dir1, outgoing_dir2)
 
-            lightFrustrum    = new BT2D.LightFrustrum(scattered_frustrum, spectrum_1, spectrum_2, @_geometry)
+            # Instantiate the scattered Lightfrustrum.
+            lightFrustrum    = new BT2D.LightFrustrum(scattered_frustrum, spectrum_1, spectrum_2, @_geometry, bounces_incoming)
+
+            # Comunicate useful information to the light Frustrum.
+            lightFrustrum.scatteredFrom(incomingLightFrustrum, @)
+
             output.push(lightFrustrum)
             return true
 

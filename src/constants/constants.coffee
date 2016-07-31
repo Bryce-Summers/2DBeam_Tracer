@@ -10,10 +10,13 @@ BT2D.Constants.NO_INTERSECTION = null
 
 # The fudge factor used in geometric queries to cull self intersections.
 BT2D.Constants.EPSILON = .0000001
+BT2D.Constants.INTERSECTION_EPSILON = .01
 
-BT2D.Constants.LIGHT_LENGTH = 40.0
+BT2D.Constants.LIGHT_LENGTH = 80.0
 
 BT2D.Constants.MINNIMUM_SCATTER_SEPARATION = 1
+
+BT2D.Constants.MAX_BOUNCES = 1
 
 # FIXME: Put the spectrum decay constant here.
 

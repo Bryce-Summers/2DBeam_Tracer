@@ -44,7 +44,6 @@ class BT2D.BinaryPartitioner
         console.log("Interface only.")
         debugger;
 
-
     # populates the intersection between the ray and this Binary partitioner.
     # if the binary partitioner was made from a line segment, then it will return the intersection on the line containing the segment,
     # even if the intersection is not inside of the segment.
@@ -57,4 +56,10 @@ class BT2D.BinaryPartitioner
     # Returns the percentage of each unit length step of the ray that constitutes movement perpendicular to this binary partitioner.
     getPerpendicularPercentage: (ray) ->
         console.log("Interface only.")
-        debugger;        
+        debugger;
+
+    # returns true iff one of the points in the input pts array is approximatly identical to one of this bp's endpoints,
+    # which may have resulted from being cut during the construction of the binary space partition.
+    containsEndPoint: (pts) ->
+        console.log("Interface only.")
+        debugger;

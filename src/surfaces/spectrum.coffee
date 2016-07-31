@@ -8,6 +8,11 @@
      
     What does that mean?
 
+
+    Design: Spectrums are designed to be immutable. Every time a user performs an operation they get a new spectrum.
+    In this way the same instance of a spectrum may be passed within multiple objects, without fear of having any of
+    them mutate the object and affect the other objects that have a copy. This should save memory.
+
 ###
 
 # red, green, and blue are stored as floats between 0.0 and 1.0
@@ -22,7 +27,6 @@ class BT2D.Spectrum
         throw new Error("bad green value") if @green < 0 or @green > 1
         throw new Error("bad blue value") if @blue < 0 or @blue > 1
 
-    
     # Returns iff this spectrum is of such a small intensity that
     # it no longer makes a perceivable contribution.
     imperceptible: ->
@@ -41,6 +45,7 @@ class BT2D.Spectrum
     add: (other) ->
         return new BT2D.Spectrum(@red + other.red, @green + other.green, @blue + other.blue);
         
+    # Same as multiplying by 1 at least in consistent arithmetic land...
     clone: ->
         return new BT2D.Spectrum(@red, @green, @blue)
         
@@ -48,5 +53,8 @@ class BT2D.Spectrum
         # FIXME: I need to extract his value to some global property configuration.
         max_length = BT2D.Constants.LIGHT_LENGTH
         return @multScalar(Math.max(0, Math.min(1.0, 1.0 - dist1/max_length)))
+
+    getTotalEnergy: () ->
+        return @red + @green + @blue
         
     

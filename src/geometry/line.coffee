@@ -493,8 +493,8 @@ class BT2D.Line #implements BT2D.Geometry, BT2D.BinaryPartitioner
         return [pt2, pt1]
 
     _radiallyOrientPts: (lightFrustrum, pt1, pt2) ->
-        orientation_ray = lightFrustrum.getSplitRay(pt1)
-        classification = orientation_ray.side_test(pt2)
+        orientation_ray = lightFrustrum.getOrientationRay(pt1)
+        classification  = orientation_ray.side_test(pt2)
 
         return [pt1, pt2] if classification >= BT2D.Constants.ON
         return [pt2, pt1]
@@ -505,6 +505,20 @@ class BT2D.Line #implements BT2D.Geometry, BT2D.BinaryPartitioner
         ray_length = 1.0#ray_dir.length()
         percentage_perp = Math.sqrt(ray_length*ray_length - percentage_par*percentage_par)
         return percentage_perp
+
+    containsEndPoint: (pts) ->
+        for pt in pts
+
+            dist1 = pt.clone().sub(@_p1).length()
+            dist2 = pt.clone().sub(@_p2).length()
+            
+            if dist1 < BT2D.Constants.INTERSECTION_EPSILON or dist2 < BT2D.Constants.INTERSECTION_EPSILON
+                return true
+
+            console.log("Distances: " + dist1 + ", " + dist2)
+
+
+        return false
 
 # Types of lines.
 BT2D.Line.SEGMENT = 0   # Both end points define ends for the line.

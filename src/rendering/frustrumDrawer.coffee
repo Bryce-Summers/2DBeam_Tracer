@@ -84,9 +84,6 @@ class BT2D.FrustrumDrawer
         if tracerScene.frustrumsNeedUpdate
         
             tracerScene.frustrumsToTriangles(@)
-
-            #FIXME: We should render the scene iff the view has changed or the scene has changed.
-            console.log(@_scene)
         
             # We then render our set of attribute interpolated triangles.
             renderer.render( @_scene, tracerScene.getCamera())

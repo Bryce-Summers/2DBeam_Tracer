@@ -137,7 +137,6 @@ class BT2D.BSP # implements BT2D.Geometry
                 # For now we will just mark these in arbitrary order, because the intersections should be culled anyways.
                 return [@_left, @_right]
 
-
     #@Override BT2D.Geometry
     intersectFrustrum: (lightFrustrum, min_time1, min_time2) ->
 
@@ -147,20 +146,68 @@ class BT2D.BSP # implements BT2D.Geometry
         bp_left  = frustrum.getLeftBP()
         bp_right = frustrum.getRightBP()
 
-        # Two points along the frustrum rays that should be guranteed to be within the space region that is represented by this bsp node.
-        pt_left  = bp_left.getPosition(min_time1)
-        pt_right = bp_right.getPosition(min_time2)
-
-        # classify the left point based on this BSP node's BP.
-        classification_left  = @_bp.side_test(pt_left)
-        classification_right = @_bp.side_test(pt_right)
-
-        # We will assume that we don't classify any 'ON' points.
-        if classification_left == BT2D.Constants.ON or classification_right == BT2D.Constants.ON
-            console.log("ERROR: Assumption invalidated, frustum not offset into cell interior, try using a fudge factor.")
-
         ray_left  = bp_left
         ray_right = bp_right
+
+        pt_left  = null
+        pt_right = null
+        classification_left  = null
+        classification_right = null
+
+        while(true)
+
+            # Two points along the frustrum rays that should be guranteed to be within the space region that is represented by this bsp node.
+            pt_left  = bp_left.getPosition(min_time1)
+            pt_right = bp_right.getPosition(min_time2)
+
+            # classify the left point based on this BSP node's BP.
+            classification_left  = @_bp.side_test(pt_left)
+            classification_right = @_bp.side_test(pt_right)
+
+            ###
+            # If we are on a boundary
+            if classification_left == BT2D.Constants.ON
+                classification_left = classification_right
+
+            if classification_right == BT2D.Constants.ON
+               classification_right = classification_left
+            ###
+
+            # If we are still in trouble, then we march forward.
+            if classification_left == BT2D.Constants.ON or classification_right == BT2D.Constants.ON
+
+                # If the bp contains one of the two points, then it must intersect with the parent bp.
+                # we therfore take a step back so as to not miss it.
+
+                perp_1 = @_bp.getPerpendicularPercentage(ray_left.getDirection())
+                perp_2 = @_bp.getPerpendicularPercentage(ray_right.getDirection())
+
+                # These additions ensure that we are properly into the far partition.
+                # The problem is that if there is a geometry that intersects this _bp presisely at the endpoint, then we will skip it.
+
+                
+                if @_bp.containsEndPoint([pt_left, pt_right])
+                    min_time1 -= BT2D.Constants.EPSILON*2/perp_1
+                    min_time2 -= BT2D.Constants.EPSILON*2/perp_2
+                else
+                    # otherwise, we want to squarely step over the partition.
+                    min_time1 += BT2D.Constants.EPSILON*2/perp_1
+                    min_time2 += BT2D.Constants.EPSILON*2/perp_2
+                ###
+
+                # otherwise, we want to squarely step over the partition.
+                min_time1 += BT2D.Constants.EPSILON/perp_1
+                min_time2 += BT2D.Constants.EPSILON/perp_2
+
+                ###
+                
+                continue;
+
+            # Otherwise we are done.
+            break;
+
+        
+
         time1 = @_bp.ray_partition_intersection_time(ray_left)
         time2 = @_bp.ray_partition_intersection_time(ray_right)
 
@@ -233,9 +280,21 @@ class BT2D.BSP # implements BT2D.Geometry
 
         # Finally search the other side if necessary.
         if (not found) and otherSide != null
+
+
             perp_1 = @_bp.getPerpendicularPercentage(ray_left.getDirection())
             perp_2 = @_bp.getPerpendicularPercentage(ray_right.getDirection())
+
+            # These additions ensure that we are properly into the far partition.
+            # The problem is that if there is a geometry that intersects this _bp presisely at the endpoint, then we will skip it.
+            time1 -= BT2D.Constants.EPSILON/perp_1
+            time2 -= BT2D.Constants.EPSILON/perp_2
+
+
+            # Therefore we must creat more sophisticated notions, such as assuming that the only time a point on a partition is passed in is when it is prescisely this case.
+            
+
             # Note: We subtract out the Epsilons to enable detection of itersections with geoemtry that perfectly end on the binary partition for this node.
-            [found, left_frustrum, right_frustrum, surface] = otherSide.intersectFrustrum(lightFrustrum, time1 - 2*BT2D.Constants.EPSILON/perp_1, time2 - 2*BT2D.Constants.EPSILON/perp_2)
+            [found, left_frustrum, right_frustrum, surface] = otherSide.intersectFrustrum(lightFrustrum, time1, time2)
 
         return [found, left_frustrum, right_frustrum, surface]
