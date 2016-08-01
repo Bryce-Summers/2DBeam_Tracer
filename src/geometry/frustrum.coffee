@@ -25,8 +25,8 @@ class BT2D.Frustrum
     # the direction vectors may be modified externally for making proper directions.
     constructor: (_start1, _start2, _dir1, _dir2) ->
 
-        @original_start1 = _start1
-        @original_start2 = _start2
+        @_original_start1 = _start1.clone()
+        @_original_start2 = _start2.clone()
 
         @_dir1 = _dir1.clone()
         @_dir2 = _dir2.clone()
@@ -34,6 +34,8 @@ class BT2D.Frustrum
         @_dir1.normalize()
         @_dir2.normalize()
 
+        @original_dir1 = @_dir1.clone()
+        @original_dir2 = @_dir2.clone()
 
         # We 'fudge' the starting positions of the frustrums to avoid intersections with this surface.
         @_start1 = _start1.clone()
@@ -57,12 +59,23 @@ class BT2D.Frustrum
             console.log("ERROR: this frustum has been set to a trivial area.");
             debugger;
 
-        if @_dir1.length() > 2
+        dir_length1 = @_dir1.length()
+        dir_length2 = @_dir2.length()
+
+        if dir_length1 > 2
             console.log("ERROR: improper direction  passed to frustrum!");
             debugger;
 
-        if @_dir2.length() > 2
+        if dir_length2 > 2
             console.log("ERROR: improper direction  passed to frustrum!");
+            debugger;
+
+        if dir_length1 < .01
+            console.log("ERROR: left direction vector is malformed! (0 length?)")
+            debugger;
+
+        if dir_length2 < .01
+            console.log("ERROR: right direction vector is malformed! (0 length?)")
             debugger;
 
     checkBounds: (p1, p2) ->
@@ -104,9 +117,13 @@ class BT2D.Frustrum
 
     # THREE.vector3's
     complete: (end1, end2) ->
+
         @_end1 = end1.clone()
         @_end2 = end2.clone()
-        
+
+        #Unfudge the frustrum.
+        @unfudge()
+
     setLeftRay: (ray) ->
         @_start1 = ray.getOrigin()
         @_dir1   = ray.getDirection()
@@ -173,6 +190,9 @@ class BT2D.Frustrum
     # Injests a point and outputs the appropiate sub ray from
     # this frustrum that contains the given pt.
     # [ray, percentage] returns the ray along with the percentage value that indicates its relationship within the set of all rays in this frustrum.
+    # MAJOR ASSUMPTION: the point should be a valid point that can non-trivially split this frustrum,
+    # for any other points, the split ray and percentages are undefined and will likely start outside of the frustrums' starting front and contain looney percentages.
+    # if you just want an orientation ray, please use getOrientationRay(pt) instead.
     getSplitRay: (pt) ->
 
         bp_start = @getStartingBP()
@@ -208,13 +228,13 @@ class BT2D.Frustrum
         if bp_start != null
             
             # We first compute the point along te starting edge that lies along the ray from the focus to the point.
-            time  = split_ray.ray_partition_intersection_time(bp_start)
+            time  = bp_start.ray_partition_intersection_time(split_ray)
             split_start = split_ray.getPosition(time)
 
             # We can then compute the percentage along the start edge via a comparison of distances.
             # FIXME: reword this, since I am tired right now.
-            dist1 = split_start.clone().sub(@_start1)
-            dist2 = split_start.clone().sub(@_start2)
+            dist1 = split_start.clone().sub(@_start1).length()
+            dist2 = split_start.clone().sub(@_start2).length()
             percentage = dist1 / (dist1 + dist2)
 
             split_ray = new BT2D.Line(split_start, pt)
@@ -232,3 +252,30 @@ class BT2D.Frustrum
             percentage = Math.min(1.0, Math.max(percentage, 0.0))
 
         return [split_ray, percentage]
+
+    # This method is used to define consistent rays that associate the frustrum with points in space.
+    # These rays may be used with line side tests to radially orient pts in space for various geoemtric tracing and splitting operations.
+    getOrientationRay: (pt) ->
+        center_pt = @_start1.clone().add(@_start2).divideScalar(2.0)
+        ray = new BT2D.Line(center_pt, pt)
+
+        # We convert it to a ray after construction to allow for us to create it with points,
+        # rather than a point and a direction vector.
+        ray.makeRay()
+
+        return ray
+
+    fudge: (min_time1, min_time2) ->
+
+        #debugger
+        @unfudge()
+
+        # fudge the frustrum to the given times.
+        @_start1 = @getLeftRay().getPosition(min_time1)
+        @_start2 = @getRightRay().getPosition(min_time2)
+
+
+    # revert to original unfudged version.
+    unfudge: () ->
+        @_start1 = @_original_start1.clone()
+        @_start2 = @_original_start2.clone()

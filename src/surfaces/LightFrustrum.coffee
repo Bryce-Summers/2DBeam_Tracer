@@ -16,20 +16,24 @@
     The source geometry is the geometry that radiated this light frustrum.
     It will be required to ensure that we do not allow a light frustrum to intersect its source, while also allowing light frustrums to intersect geometries
     that intersect the source at the starting points.
+
+    FIXME: I might want to go an make all of these variables private when I get a chance.
+
+    My idea for maintaining this as it gets more complex is to make clones of light frustrums, then only mutate those values as necessary.
 ###
 
 class BT2D.LightFrustrum
-    constructor: (@frustrum, @spectrum1, @spectrum2, @source_geometry) ->
+    constructor: (@frustrum, @spectrum1, @spectrum2) ->
         @spectrum3 = null
         @spectrum4 = null
-        
+        @_bounces = 0
+        @_source_geometry = null
     
     # Complete the Light Frustrum with the far side.
     complete: (end1, end2, dist1, dist2) ->
 
         if end1.clone().sub(end2).length() < .001
             console.log("ERROR: Bad completion. 2D Beam tracer frustrums are guranteed to never intersect the same end points.");
-            debugger;
 
         @frustrum.complete(end1, end2)
         
@@ -40,12 +44,32 @@ class BT2D.LightFrustrum
         
         # End 2.
         @spectrum3 = @spectrum2.decay(dist2)
+
+    clone: () ->
+        output = new BT2D.LightFrustrum(@frustrum, @spectrum1, @spectrum2, @source_geometry)
+        output._bounces = @_bounces
+        return output
+
         
     getEndSpectrum1: () ->
-        return @spectrum4
+        return @spectrum4.clone()
 
     getEndSpectrum2: () ->
-        return @spectrum3
+        return @spectrum3.clone()
+
+
+    # This method is called to provide the light frustrum with information about its light path if it needs it eventually.
+    # This information is also use to compute an accurate number of bounces.
+    scatteredFrom: (parentLightFrustrum, surface) ->
+        @_bounces = parentLightFrustrum.getNumBounces() + 1
+        @_souce_geometry = surface
+
+    _copyStatisticsFrom: (other) ->
+        @_bounces = other._bounces
+        @_source_geometry = other._source_geometry
+
+    getNumBounces: () ->
+        return @_bounces
 
     # BT2D.FrustrumDrawer
     convertToTriangles: (frustrumDrawer) ->
@@ -74,12 +98,15 @@ class BT2D.LightFrustrum
     # Properly interpolates the light spectrum values.
     # The input pt represents the left pt of a piece of geometery that does not occlude the left side of this frustrum.
     # Returns null if the split off frustum had trivial area.
-    splitLeft : (pt) ->
+    splitLeft : (pt) ->        
 
         [split_ray, percentage] = @frustrum.getSplitRay(pt)
 
         # In this case, this frustum only touches the line, but doesn't contain a non trivial intersection area.
-        if percentage > 1.0 - BT2D.Constants.EPSILON or percentage < 0.0 + BT2D.Constants.EPSILON
+
+        # FIXME: I get the feeling that percentages are not commensurate with world distances and therefore they don't scale well with epsilon.
+
+        if percentage > 1.0 - BT2D.Constants.EPSILON*10 or percentage < 0.0 + BT2D.Constants.EPSILON*10
             console.log("WARNING: A trivial splitLeft was attempted.")
             debugger;
             return null
@@ -88,8 +115,8 @@ class BT2D.LightFrustrum
                                             @frustrum.getDir1(), split_ray.getDirection())
 
         split_spectrum = @spectrum1.multScalar(percentage).add(@spectrum2.multScalar(1.0 - percentage))
-
         output = new BT2D.LightFrustrum(left_frustrum, @spectrum1, split_spectrum)
+        output._copyStatisticsFrom(@)
 
         # Now mutate this light spectrum to be the right of the split.
         @spectrum1 = split_spectrum
@@ -100,7 +127,6 @@ class BT2D.LightFrustrum
     # Returns null if the split off frustum had trivial area.
     splitRight : (pt) ->
 
-
         ###
         This is where the problem happens.
         ###
@@ -108,8 +134,9 @@ class BT2D.LightFrustrum
         [split_ray, percentage] = @frustrum.getSplitRay(pt)
 
         # In this case, this frustum only touches the line, but doesn't contain a non trivial intersection area.
-        if percentage > 1.0 - BT2D.Constants.EPSILON or percentage < 0.0 + BT2D.Constants.EPSILON
+        if percentage > 1.0 - BT2D.Constants.EPSILON*10 or percentage < 0.0 + BT2D.Constants.EPSILON*10
             console.log("WARNING: A trivial splitRight was attempted.")
+            # Note: This won't necessarily catch all infractions, but later will to the trick when a trivial frustrum is constructed.
             debugger;
             return null
         
@@ -120,6 +147,7 @@ class BT2D.LightFrustrum
         split_spectrum = @spectrum1.multScalar(percentage).add(@spectrum2.multScalar(1.0 - percentage))            
 
         output = new BT2D.LightFrustrum(right_frustrum, split_spectrum, @spectrum2)
+        output._copyStatisticsFrom(@)
 
         # Now mutate this light spectrum to be the left of the split.
         @spectrum2 = split_spectrum
@@ -132,3 +160,13 @@ class BT2D.LightFrustrum
     getSplitRay: (pt) ->
         [split_ray, percentage] = @frustrum.getSplitRay(pt)
         return split_ray
+
+    getOrientationRay: (pt) ->
+        return @frustrum.getOrientationRay(pt)
+
+    # Set the frustrum to the given fudge factors to get around nasty corners.
+    fudge: (min_time1, min_time2) ->
+        @frustrum.fudge(min_time1, min_time2)
+
+    unfudge: () ->
+        @frustrum.unfudge()

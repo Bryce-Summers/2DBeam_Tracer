@@ -16,10 +16,24 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
 
         fullIntensitySpectrum = new BT2D.Spectrum(1.0, 1.0, 1.0)
         noIntensitySpectrum   = new BT2D.Spectrum(0.0, 0.0, 0.0)
+        blueSpectrum = new BT2D.Spectrum(0.0, 0.0, 1.0)
+        redSpectrum = new BT2D.Spectrum(1.0, 0.0, 0.0)
 
-        @emmissiveSourceMaterial  = new BT2D.Material(fullIntensitySpectrum)
-        @absorptiveSourceMaterial = new BT2D.Material(noIntensitySpectrum)
-        
+
+        @emmissiveSourceMaterial  = new BT2D.Material()
+        @emmissiveSourceMaterial.setEmissive(fullIntensitySpectrum)
+
+        # DEFAULT material...
+        @absorptiveSourceMaterial = new BT2D.Material()
+
+        # Converts all red energy into blue energy...
+        @specularSourceMaterial = new BT2D.Material()
+        # Convert red to blue on bounce.
+        @specularSourceMaterial.setSpecularBlue(redSpectrum)
+        # convert blue to green.
+        @specularSourceMaterial.setSpecularGreen(blueSpectrum)
+
+
         @createScene(n)
 
     createScene: (n) ->
@@ -29,9 +43,9 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
         
         # generate the scene.
         #@createPolarTestScene(n)
-        #@createBasicTestScene(n);
-
-        @createRandomScene(n)
+        @createBasicTestScene(n)
+        
+        #@createRandomScene(n)
 
         console.log("Creating scene!")
 
@@ -50,13 +64,21 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
             # Create the inner flood lights.
             #@createPolarSurface(@emmissiveSourceMaterial, 5, i + inc/10 + .05, i + inc + inc/10 - .05)
             # Create the outer fully absorbtive walls.
-            @createPolarSurface(@absorptiveSourceMaterial, 50, i + inc*3/2 , i + inc/2)
+            @createPolarSurface(@specularSourceMaterial, 50, i + inc*3/2 , i + inc/2)
 
     createRandomScene: (n) ->
-        for i in [0 ... n*30]
+        for i in [0 ... n]
             v1 = @randomVector(50)
-            v2 = v1.clone().add(new THREE.Vector3(0, 3, 0))
-            @createSurface(@absorptiveSourceMaterial,
+
+            length = 5
+
+            angle = Math.random()*Math.PI*2
+            offset = new THREE.Vector3(5*Math.cos(angle), 5*Math.sin(angle), 0)
+
+            v2 = v1.clone().add(offset)
+            @createSurface(
+                    @specularSourceMaterial,
+                    #@absorptiveSourceMaterial
                 v1,
                 v2)
 
@@ -75,9 +97,9 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
             )
         ###
 
-        
+        ###
         # A wall in the middle of the screen.
-        @createSurface(@absorptiveSourceMaterial,
+        @createSurface(@specularSourceMaterial,
             new THREE.Vector3( -10, -1, 0)
             new THREE.Vector3(  10, 3, 0))
 
@@ -85,6 +107,26 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
         @createSurface(@absorptiveSourceMaterial,
             new THREE.Vector3(  -10, -1, 0)
             new THREE.Vector3(   -5, 5, 0))
+
+        ###
+
+        ###
+        @createSurface(@specularSourceMaterial,
+            new THREE.Vector3(  -10, 20, 0)
+            new THREE.Vector3(   20, -10, 0))
+
+        @createSurface(@specularSourceMaterial,
+            new THREE.Vector3(  -20, 10, 0)
+            new THREE.Vector3(  1, 5, 0))
+        ###
+
+        @createSurface(@specularSourceMaterial,
+            new THREE.Vector3(  -10, 10, 0)
+            new THREE.Vector3(   10, 9, 0))
+
+        @createSurface(@specularSourceMaterial,
+            new THREE.Vector3(  19, 20, 0)
+            new THREE.Vector3(  20, -20, 0))
 
 
     # Here are two helper functions for our test scene.
@@ -100,10 +142,10 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
     # this function creates walls on the edges of the scene.
     createViewBoundaryWalls: () ->
 
-        x0 = -50
-        x1 =  50
-        y0 = -50
-        y1 =  50
+        x0 = -50.01
+        x1 =  50.01
+        y0 = -50.01
+        y1 =  50.01
 
         offset = 10
 
