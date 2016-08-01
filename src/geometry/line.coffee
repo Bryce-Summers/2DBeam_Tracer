@@ -10,7 +10,11 @@
 class BT2D.Line #implements BT2D.Geometry, BT2D.BinaryPartitioner
 
     constructor: (_p1, _p2, @_type = BT2D.Line.SEGMENT) ->
-    
+
+        if _p1.clone().sub(_p2).length() < .00001
+            console.log("illegal line, endpoints are the same!")
+            debugger;
+
         if @_type != BT2D.Line.RAY
             @_p1 = _p1.clone()
             @_p2 = _p2.clone()
@@ -114,12 +118,17 @@ class BT2D.Line #implements BT2D.Geometry, BT2D.BinaryPartitioner
     # NOTE: we don't returns a surface here, because geometries know naught about surfaces.
     intersectFrustrum: (lightFrustrum, min_time1, min_time2) ->
 
+
+        lightFrustrum.fudge(min_time1, min_time2)
+
+
         # prevent self intersections.
         # We need to explicitly do this, instead of handling it with the fudge factors, because we want to allow the proper transitioning
         # between geometries intersect each other at the same source point.
         # Hopefully the point with not be juggled infinitly between the two surfaces, because frustrum bound non-intersection checking should
         # weed out the bad cases.
         if lightFrustrum.source_geometry == @
+            lightFrustrum.unfudge()
             return [false, null, null, null]
 
         frustrum = lightFrustrum.frustrum
@@ -127,6 +136,7 @@ class BT2D.Line #implements BT2D.Geometry, BT2D.BinaryPartitioner
         # Extract relevant Binary Partitioners.
         bp_left  = frustrum.getLeftBP()
         bp_right = frustrum.getRightBP()
+
         ray1 = bp_left
         ray2 = bp_right
 
@@ -249,13 +259,15 @@ class BT2D.Line #implements BT2D.Geometry, BT2D.BinaryPartitioner
         if t_left == BT2D.Constants.NO_INTERSECTION and 
         ###
 
+        # Once we have determined whether the intersection exists or not, we can unfudge the frustrum to make sure the correct splits are made.
+        lightFrustrum.unfudge()
 
         # Detect non-intersections.
         if not intersection_exists
             return [false, null, null, null]
 
         # From here on out an intersection does exist.
-
+        
         intersection1 = new BT2D.Intersection()
         intersection2 = new BT2D.Intersection()
 
@@ -511,14 +523,14 @@ class BT2D.Line #implements BT2D.Geometry, BT2D.BinaryPartitioner
 
             dist1 = pt.clone().sub(@_p1).length()
             dist2 = pt.clone().sub(@_p2).length()
-            
+
             if dist1 < BT2D.Constants.INTERSECTION_EPSILON or dist2 < BT2D.Constants.INTERSECTION_EPSILON
                 return true
 
             console.log("Distances: " + dist1 + ", " + dist2)
 
-
         return false
+
 
 # Types of lines.
 BT2D.Line.SEGMENT = 0   # Both end points define ends for the line.

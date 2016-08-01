@@ -57,7 +57,7 @@ class BT2D.FrustrumTracer
     # FIXME: This is just for testing purposes.
     addPointLight: () ->
 
-        center = new THREE.Vector3( BT2D.mouse_x, BT2D.mouse_y, 0)
+        center = new THREE.Vector3( BT2D.mouse_x + .0000123749, BT2D.mouse_y + .0000012937129, 0)
         #center = BT2D.center
 
         left   = new THREE.Vector3(-1,  0, 0)

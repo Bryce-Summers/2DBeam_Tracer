@@ -28,7 +28,10 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
 
         # Converts all red energy into blue energy...
         @specularSourceMaterial = new BT2D.Material()
+        # Convert red to blue on bounce.
         @specularSourceMaterial.setSpecularBlue(redSpectrum)
+        # convert blue to green.
+        @specularSourceMaterial.setSpecularGreen(blueSpectrum)
 
 
         @createScene(n)
@@ -107,6 +110,7 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
 
         ###
 
+        ###
         @createSurface(@specularSourceMaterial,
             new THREE.Vector3(  -10, 20, 0)
             new THREE.Vector3(   20, -10, 0))
@@ -114,6 +118,15 @@ class BT2D.RadialTestScene extends BT2D.BeamTracerScene
         @createSurface(@specularSourceMaterial,
             new THREE.Vector3(  -20, 10, 0)
             new THREE.Vector3(  1, 5, 0))
+        ###
+
+        @createSurface(@specularSourceMaterial,
+            new THREE.Vector3(  -10, 10, 0)
+            new THREE.Vector3(   10, 9, 0))
+
+        @createSurface(@specularSourceMaterial,
+            new THREE.Vector3(  19, 20, 0)
+            new THREE.Vector3(  20, -20, 0))
 
 
     # Here are two helper functions for our test scene.

@@ -25,10 +25,8 @@ class BT2D.Frustrum
     # the direction vectors may be modified externally for making proper directions.
     constructor: (_start1, _start2, _dir1, _dir2) ->
 
-        @original_start1 = _start1
-        @original_start2 = _start2
-
-
+        @_original_start1 = _start1.clone()
+        @_original_start2 = _start2.clone()
 
         @_dir1 = _dir1.clone()
         @_dir2 = _dir2.clone()
@@ -61,12 +59,23 @@ class BT2D.Frustrum
             console.log("ERROR: this frustum has been set to a trivial area.");
             debugger;
 
-        if @_dir1.length() > 2
+        dir_length1 = @_dir1.length()
+        dir_length2 = @_dir2.length()
+
+        if dir_length1 > 2
             console.log("ERROR: improper direction  passed to frustrum!");
             debugger;
 
-        if @_dir2.length() > 2
+        if dir_length2 > 2
             console.log("ERROR: improper direction  passed to frustrum!");
+            debugger;
+
+        if dir_length1 < .01
+            console.log("ERROR: left direction vector is malformed! (0 length?)")
+            debugger;
+
+        if dir_length2 < .01
+            console.log("ERROR: right direction vector is malformed! (0 length?)")
             debugger;
 
     checkBounds: (p1, p2) ->
@@ -108,9 +117,13 @@ class BT2D.Frustrum
 
     # THREE.vector3's
     complete: (end1, end2) ->
+
         @_end1 = end1.clone()
         @_end2 = end2.clone()
-        
+
+        #Unfudge the frustrum.
+        @unfudge()
+
     setLeftRay: (ray) ->
         @_start1 = ray.getOrigin()
         @_dir1   = ray.getDirection()
@@ -251,3 +264,18 @@ class BT2D.Frustrum
         ray.makeRay()
 
         return ray
+
+    fudge: (min_time1, min_time2) ->
+
+        #debugger
+        @unfudge()
+
+        # fudge the frustrum to the given times.
+        @_start1 = @getLeftRay().getPosition(min_time1)
+        @_start2 = @getRightRay().getPosition(min_time2)
+
+
+    # revert to original unfudged version.
+    unfudge: () ->
+        @_start1 = @_original_start1.clone()
+        @_start2 = @_original_start2.clone()

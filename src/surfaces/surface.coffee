@@ -46,14 +46,9 @@ class BT2D.Surface
         
         if @_geometry instanceof BT2D.Line
 
+            # End bounce paths after the limit.
             bounces_incoming = incomingLightFrustrum.getNumBounces()
-
-            # We need to limit the number of bounces for safety.
-
-            console.log(bounces_incoming) if bounces_incoming != 0
-
             if bounces_incoming >= BT2D.Constants.MAX_BOUNCES
-                console.log("culling " + bounces_incoming + " bounce path")
                 return false
 
             # Since we are prefectly reflecting, the orientation will have changed and we therefore reverse the 1 and 2 rays
@@ -94,12 +89,14 @@ class BT2D.Surface
             end1 = input_frustrum.getEnd2()
             end2 = input_frustrum.getEnd1()
 
+            ###
+            Let us stop being scared and not fudge this the wrong way.
             end1.sub(incoming_dir1.multiplyScalar(BT2D.Constants.EPSILON*2/perp_1))
             end2.sub(incoming_dir2.multiplyScalar(BT2D.Constants.EPSILON*2/perp_2))
+            ###
 
             if end1.clone().sub(end2).length() < BT2D.Constants.MINNIMUM_SCATTER_SEPARATION and 
-               outgoing_dir1.clone().dot(outgoing_dir2) > .999
-                console.log("Discarding small frustrum.")
+               outgoing_dir1.clone().dot(outgoing_dir2) > 1.0 - BT2D.Constants.EPSILON
                 return
 
             # Instantate the frustrum geometry.

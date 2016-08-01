@@ -154,6 +154,12 @@ class BT2D.BSP # implements BT2D.Geometry
         classification_left  = null
         classification_right = null
 
+        time1 = @_bp.ray_partition_intersection_time(ray_left)
+        time2 = @_bp.ray_partition_intersection_time(ray_right)
+
+        original_min_time1 = min_time1
+        original_min_time2 = min_time2
+
         while(true)
 
             # Two points along the frustrum rays that should be guranteed to be within the space region that is represented by this bsp node.
@@ -173,43 +179,55 @@ class BT2D.BSP # implements BT2D.Geometry
                classification_right = classification_left
             ###
 
-            # If we are still in trouble, then we march forward.
-            if classification_left == BT2D.Constants.ON or classification_right == BT2D.Constants.ON
+            # Both pts are on the boundary... 
 
-                # If the bp contains one of the two points, then it must intersect with the parent bp.
-                # we therfore take a step back so as to not miss it.
+            perp_1 = @_bp.getPerpendicularPercentage(ray_left.getDirection())
+            perp_2 = @_bp.getPerpendicularPercentage(ray_right.getDirection())
 
-                perp_1 = @_bp.getPerpendicularPercentage(ray_left.getDirection())
-                perp_2 = @_bp.getPerpendicularPercentage(ray_right.getDirection())
+            if classification_left == BT2D.Constants.ON and classification_right == BT2D.Constants.ON
 
-                # These additions ensure that we are properly into the far partition.
-                # The problem is that if there is a geometry that intersects this _bp presisely at the endpoint, then we will skip it.
-
-                
-                if @_bp.containsEndPoint([pt_left, pt_right])
-                    min_time1 -= BT2D.Constants.EPSILON*2/perp_1
-                    min_time2 -= BT2D.Constants.EPSILON*2/perp_2
-                else
-                    # otherwise, we want to squarely step over the partition.
-                    min_time1 += BT2D.Constants.EPSILON*2/perp_1
-                    min_time2 += BT2D.Constants.EPSILON*2/perp_2
-                ###
-
-                # otherwise, we want to squarely step over the partition.
-                min_time1 += BT2D.Constants.EPSILON/perp_1
-                min_time2 += BT2D.Constants.EPSILON/perp_2
-
-                ###
-                
+                min_time1 = original_min_time1 + BT2D.Constants.EPSILON*2/perp_1
+                min_time2 = original_min_time2 + BT2D.Constants.EPSILON*2/perp_2
+             
+                # FIXME: take this out of a loop if I gain confidence in this solution's integrity.
                 continue;
+
+            else if classification_left == BT2D.Constants.ON and classification_right != BT2D.Constants.ON
+
+                temp = min_time1
+
+                min_time1 -= BT2D.Constants.EPSILON*2/perp_1
+                pt_left  = bp_left.getPosition(min_time1)
+                classification_left  = @_bp.side_test(pt_left)
+
+                if classification_left != classification_right
+                    min_time1 = temp + BT2D.Constants.EPSILON*2/perp_1
+                    pt_left  = bp_left.getPosition(min_time1)
+                    classification_left  = @_bp.side_test(pt_left)
+
+                if classification_left != classification_right
+                    console.log("ERROR: bsp BP crossing. I have no clue how this could happen!")
+                    debugger
+
+            else if classification_right == BT2D.Constants.ON and classification_left != BT2D.Constants.ON
+
+                temp = min_time2
+
+                min_time2 -= BT2D.Constants.EPSILON*2/perp_2
+                pt_right  = bp_right.getPosition(min_time2)
+                classification_right  = @_bp.side_test(pt_right)
+
+                if classification_right != classification_left
+                    min_time2 = temp + BT2D.Constants.EPSILON*2/perp_2
+                    pt_right  = bp_right.getPosition(min_time2)
+                    classification_right  = @_bp.side_test(pt_right)
+
+                if classification_right != classification_left
+                    console.log("ERROR: bsp BP crossing (2). I have no clue how this could happen!")
+                    debugger
 
             # Otherwise we are done.
             break;
-
-        
-
-        time1 = @_bp.ray_partition_intersection_time(ray_left)
-        time2 = @_bp.ray_partition_intersection_time(ray_right)
 
         # -- We must choose the starting classification to determine the order that we will transverse this BSP.
 
@@ -236,7 +254,7 @@ class BT2D.BSP # implements BT2D.Geometry
                 classifier = @_bp.side_test(focus)
 
 
-        # - We now perform the search in the proper order determined as determined by the classifier specified above.
+        # - We now perform the search in the proper order as determined by the classifier specified above.
 
         [frustrum_side, otherSide] = @_orientChildSets(classifier)
 
@@ -247,7 +265,7 @@ class BT2D.BSP # implements BT2D.Geometry
 
         # Search this side.
         if frustrum_side != null
-            [found, left_frustrum, right_frustrum, surface] = frustrum_side.intersectFrustrum(lightFrustrum, min_time1, min_time2)
+            [found, left_frustrum, right_frustrum, surface] = frustrum_side.intersectFrustrum(lightFrustrum, original_min_time1, original_min_time2)
 
         if found
             return [true, left_frustrum, right_frustrum, surface]
@@ -287,9 +305,10 @@ class BT2D.BSP # implements BT2D.Geometry
 
             # These additions ensure that we are properly into the far partition.
             # The problem is that if there is a geometry that intersects this _bp presisely at the endpoint, then we will skip it.
-            time1 -= BT2D.Constants.EPSILON/perp_1
-            time2 -= BT2D.Constants.EPSILON/perp_2
-
+            ###
+            time1 += BT2D.Constants.EPSILON/perp_1
+            time2 += BT2D.Constants.EPSILON/perp_2
+            ###
 
             # Therefore we must creat more sophisticated notions, such as assuming that the only time a point on a partition is passed in is when it is prescisely this case.
             

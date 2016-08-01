@@ -108,6 +108,7 @@ class BT2D.LightFrustrum
 
         if percentage > 1.0 - BT2D.Constants.EPSILON*10 or percentage < 0.0 + BT2D.Constants.EPSILON*10
             console.log("WARNING: A trivial splitLeft was attempted.")
+            debugger;
             return null
 
         left_frustrum = new BT2D.Frustrum(@frustrum.getStart1(), split_ray.getOrigin(),
@@ -162,3 +163,10 @@ class BT2D.LightFrustrum
 
     getOrientationRay: (pt) ->
         return @frustrum.getOrientationRay(pt)
+
+    # Set the frustrum to the given fudge factors to get around nasty corners.
+    fudge: (min_time1, min_time2) ->
+        @frustrum.fudge(min_time1, min_time2)
+
+    unfudge: () ->
+        @frustrum.unfudge()
