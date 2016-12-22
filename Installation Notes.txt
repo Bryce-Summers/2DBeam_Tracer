@@ -2,7 +2,7 @@
 
 Download grunt to inject the all of the files automatically.
 
-// Initialize nom repository.
+// Initialize npm repository.
 npm init
 
 <!-- include: "type": "css", "files": "**/*.css" -->
